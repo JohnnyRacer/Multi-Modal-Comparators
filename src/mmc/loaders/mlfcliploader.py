@@ -36,7 +36,7 @@ class MlfClipLoader(BaseMmcLoader):
         self.modalities = (TEXT, IMAGE)
         self.metadata = {} if metadata is None else metadata
 
-    def load(self, device=DEVICE):
+    def load(self,device=DEVICE,half_precison=True):
         """
         Returns the MMC associated with this loader.
         """
@@ -44,11 +44,14 @@ class MlfClipLoader(BaseMmcLoader):
         #model, preprocess_image = clip.load(self.id, jit=False, device=device)
         model_name, dataset = self.id.split('--')
         #model, _, preprocess_image = open_clip.create_model_and_transforms(
+
         model, preprocess_image, _ = open_clip.create_model_and_transforms(
             model_name=model_name, 
             pretrained=dataset)
 
         model.requires_grad_(False)
+        if half_precison:
+            model.half() # Converts the model weights to fp16 to save memory 
         model.eval()
         #model.set_grad_checkpointing()
         model.to(device, memory_format=torch.channels_last)

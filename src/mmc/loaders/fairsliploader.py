@@ -153,7 +153,7 @@ class FairSlipLoaderBase(BaseMmcLoader):
             SLIP_VITL16
             )
 
-    def load(self, device=DEVICE):
+    def load(self, device=DEVICE, half_precision=True):
         """
         Returns the MMC associated with this loader.
         """
@@ -173,6 +173,8 @@ class FairSlipLoaderBase(BaseMmcLoader):
         fix_param_names(ckpt)
         model = model_factory(**kwargs)
         model.load_state_dict(ckpt['state_dict'], strict=True)
+        if half_precision:
+            model.half()
         model = model.eval().to(device)
 
         from SLIP.tokenizer import SimpleTokenizer
